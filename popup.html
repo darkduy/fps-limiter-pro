@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FPS Limiter Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <div class="container">
+    <div id="currentSite">Đang tải...</div>
+
+    <div class="setting-group">
+      <div class="setting-row">
+        <label for="masterDisable">Tắt Toàn Bộ Extension</label>
+        <label class="switch">
+          <input type="checkbox" id="masterDisable">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="main-controls">
+      <div class="setting-group">
+        <div class="setting-row">
+          <label for="applyGlobal">Dùng Cài Đặt Chung</label>
+          <label class="switch">
+            <input type="checkbox" id="applyGlobal">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label for="iframeEnable">Áp Dụng Cho iFrame</label>
+          <label class="switch">
+            <input type="checkbox" id="iframeEnable">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="setting-group site-settings">
+        <div class="setting-row">
+          <label for="enabledCheckbox">Bật/Tắt Giới Hạn</label>
+          <label class="switch">
+            <input type="checkbox" id="enabledCheckbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+        
+        <div class="fps-controls">
+          <label>FPS</label>
+          <input type="range" id="fpsSlider" min="1" max="240" value="60">
+          <input type="number" id="fpsInput" min="1" max="240" value="60">
+        </div>
+        
+        <div class="presets">
+          <button data-fps="30">30</button>
+          <button data-fps="60">60</button>
+          <button data-fps="75">75</button>
+          <button data-fps="120">120</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
