@@ -1,3 +1,6 @@
+/* src/popup.css */
+
+/* Biến màu cho dễ tùy chỉnh (Theme) */
 :root {
   --bg-color: #282c34;
   --bg-light: #353a44;
@@ -21,7 +24,7 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 14px; /* Khoảng cách giữa các nhóm */
 }
 
 .setting-group {
@@ -55,6 +58,7 @@ label {
   border: 1px solid var(--border-color);
 }
 
+/* === Toggle Switch === */
 .switch {
   position: relative;
   display: inline-block;
@@ -100,6 +104,7 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+/* === Custom Slider & Number Input === */
 .fps-controls {
   display: flex;
   align-items: center;
@@ -137,6 +142,7 @@ input[type="number"] {
   font-weight: bold;
 }
 
+/* === Preset Buttons === */
 .presets {
   display: flex;
   justify-content: space-between;
