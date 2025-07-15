@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FPS Limiter Pro",
-  "version": "3.0",
+  "version": "3.0.0",
   "description": "Phiên bản cuối cùng: Giới hạn FPS với kiến trúc ổn định, hiệu năng cao và giao diện hiện đại.",
   "permissions": [
     "storage",
@@ -12,7 +12,8 @@
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
