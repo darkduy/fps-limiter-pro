@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // === DOM Elements ===
     const masterDisable = document.getElementById('masterDisable');
     const mainControls = document.querySelector('.main-controls');
     const currentSiteLabel = document.getElementById('currentSite');
@@ -11,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentHost = 'global';
 
-    // === Functions ===
     function syncFpsControls(value) {
         fpsSlider.value = value;
         fpsInput.value = value;
@@ -40,14 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadSettings() {
         const data = await chrome.storage.local.get(null);
         
-        // Master disable
         masterDisable.checked = data.globalDisabled ?? false;
         mainControls.style.display = masterDisable.checked ? 'none' : 'block';
         
-        // Iframe enable
         iframeEnable.checked = data.applyInFrames ?? false;
 
-        // Per-site logic
         const siteConfig = data[currentHost];
         const globalConfig = data.global ?? { enabled: true, value: 60 };
         
@@ -60,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleSiteSettingsUI(applyGlobal.checked);
     }
 
-    // === Event Listeners ===
     masterDisable.addEventListener('change', () => {
         chrome.storage.local.set({ globalDisabled: masterDisable.checked });
         mainControls.style.display = masterDisable.checked ? 'none' : 'block';
@@ -80,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fpsSlider.addEventListener('input', () => {
         syncFpsControls(fpsSlider.value);
     });
-    fpsSlider.addEventListener('change', saveSettings); // Save only when user releases slider
+    fpsSlider.addEventListener('change', saveSettings);
 
     fpsInput.addEventListener('change', () => {
         let value = parseInt(fpsInput.value, 10);
@@ -98,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // === Initialization ===
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0] && tabs[0].url) {
             try {
