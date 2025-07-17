@@ -8,6 +8,6 @@ export default defineConfig({
   ],
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
+    emptyOutDir: true, // Đảm bảo thư mục build luôn sạch
   }
 });
