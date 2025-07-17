@@ -1,107 +1,142 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const masterDisable = document.getElementById('masterDisable');
-    const mainControls = document.querySelector('.main-controls');
-    const currentSiteLabel = document.getElementById('currentSite');
-    const applyGlobal = document.getElementById('applyGlobal');
-    const iframeEnable = document.getElementById('iframeEnable');
-    const enabledCheckbox = document.getElementById('enabledCheckbox');
-    const fpsSlider = document.getElementById('fpsSlider');
-    const fpsInput = document.getElementById('fpsInput');
+    const elements = {
+        masterDisable: document.getElementById('masterDisable'),
+        mainControls: document.querySelector('.main-controls'),
+        currentSiteLabel: document.getElementById('currentSite'),
+        applyGlobal: document.getElementById('applyGlobal'),
+        iframeEnable: document.getElementById('iframeEnable'),
+        enabledCheckbox: document.getElementById('enabledCheckbox'),
+        fpsSlider: document.getElementById('fpsSlider'),
+        fpsInput: document.getElementById('fpsInput'),
+        autoModeMasterEnable: document.getElementById('autoModeMasterEnable'),
+        autoModeListEl: document.getElementById('autoModeList'),
+        addSiteForm: document.getElementById('addSiteForm'),
+        newSiteDomainInput: document.getElementById('newSiteDomain'),
+    };
 
     let currentHost = 'global';
+    let autoModeConfigs = [];
+    let siteConfigCache = {};
 
     function syncFpsControls(value) {
-        fpsSlider.value = value;
-        fpsInput.value = value;
+        elements.fpsSlider.value = value;
+        elements.fpsInput.value = value;
     }
 
-    async function saveSettings() {
-        const siteSettings = {
-            enabled: enabledCheckbox.checked,
-            value: parseInt(fpsInput.value, 10),
-        };
-
-        if (applyGlobal.checked) {
-            await chrome.storage.local.remove(currentHost);
-            await chrome.storage.local.set({ global: siteSettings });
-        } else {
-            await chrome.storage.local.set({ [currentHost]: siteSettings });
-        }
-    }
-    
-    function toggleSiteSettingsUI(disabled) {
-        const group = document.querySelector('.site-settings');
-        group.style.opacity = disabled ? '0.5' : '1';
-        group.querySelectorAll('input, button').forEach(el => el.disabled = disabled);
+    function renderAutoModeList() {
+        elements.autoModeListEl.innerHTML = '';
+        autoModeConfigs.forEach((config, index) => {
+            const item = document.createElement('li');
+            item.className = 'auto-mode-item';
+            item.innerHTML = `<span class="domain">${config.domain}</span><input type="number" value="${config.fps}" min="1" max="240" data-index="${index}"><button data-index="${index}">Xóa</button>`;
+            elements.autoModeListEl.appendChild(item);
+        });
     }
 
-    async function loadSettings() {
+    async function saveAutoModeList() {
+        await chrome.storage.local.set({ autoModeConfigs: autoModeConfigs });
+    }
+
+    async function loadSettingsForCurrentTab() {
         const data = await chrome.storage.local.get(null);
+        autoModeConfigs = data.autoModeConfigs || [];
+        renderAutoModeList();
+
+        elements.masterDisable.checked = data.globalDisabled ?? false;
+        elements.mainControls.style.display = elements.masterDisable.checked ? 'none' : 'block';
         
-        masterDisable.checked = data.globalDisabled ?? false;
-        mainControls.style.display = masterDisable.checked ? 'none' : 'block';
-        
-        iframeEnable.checked = data.applyInFrames ?? false;
+        elements.autoModeMasterEnable.checked = data.autoModeMasterEnable ?? true;
+        elements.iframeEnable.checked = data.applyInFrames ?? false;
 
         const siteConfig = data[currentHost];
         const globalConfig = data.global ?? { enabled: true, value: 60 };
         
-        applyGlobal.checked = !siteConfig;
+        elements.applyGlobal.checked = !siteConfig;
         
-        const finalConfig = siteConfig ?? globalConfig;
-        enabledCheckbox.checked = finalConfig.enabled;
-        syncFpsControls(finalConfig.value);
-
-        toggleSiteSettingsUI(applyGlobal.checked);
+        siteConfigCache = siteConfig ?? globalConfig;
+        elements.enabledCheckbox.checked = siteConfigCache.enabled;
+        syncFpsControls(siteConfigCache.value);
     }
 
-    masterDisable.addEventListener('change', () => {
-        chrome.storage.local.set({ globalDisabled: masterDisable.checked });
-        mainControls.style.display = masterDisable.checked ? 'none' : 'block';
-    });
-
-    iframeEnable.addEventListener('change', () => {
-        chrome.storage.local.set({ applyInFrames: iframeEnable.checked });
-    });
+    elements.masterDisable.addEventListener('change', (e) => chrome.storage.local.set({ globalDisabled: e.target.checked }));
+    elements.autoModeMasterEnable.addEventListener('change', (e) => chrome.storage.local.set({ autoModeMasterEnable: e.target.checked }));
+    elements.iframeEnable.addEventListener('change', (e) => chrome.storage.local.set({ applyInFrames: e.target.checked }));
     
-    applyGlobal.addEventListener('change', () => {
-        toggleSiteSettingsUI(applyGlobal.checked);
-        saveSettings();
+    elements.applyGlobal.addEventListener('change', async (e) => {
+        if (e.target.checked) {
+            await chrome.storage.local.remove(currentHost);
+        } else {
+            await chrome.storage.local.set({ [currentHost]: siteConfigCache });
+        }
     });
 
-    enabledCheckbox.addEventListener('change', saveSettings);
+    const saveSiteSettings = () => {
+        const newConfig = {
+            enabled: elements.enabledCheckbox.checked,
+            value: parseInt(elements.fpsInput.value, 10),
+        };
+        siteConfigCache = newConfig;
+        const keyToSave = elements.applyGlobal.checked ? 'global' : currentHost;
+        chrome.storage.local.set({ [keyToSave]: newConfig });
+    };
     
-    fpsSlider.addEventListener('input', () => {
-        syncFpsControls(fpsSlider.value);
-    });
-    fpsSlider.addEventListener('change', saveSettings);
-
-    fpsInput.addEventListener('change', () => {
-        let value = parseInt(fpsInput.value, 10);
+    elements.enabledCheckbox.addEventListener('change', saveSiteSettings);
+    elements.fpsSlider.addEventListener('change', saveSiteSettings);
+    elements.fpsInput.addEventListener('change', () => {
+        let value = parseInt(elements.fpsInput.value, 10);
         if (isNaN(value) || value < 1) value = 1;
         if (value > 240) value = 240;
         syncFpsControls(value);
-        saveSettings();
+        saveSiteSettings();
     });
 
     document.querySelectorAll('.presets button').forEach(button => {
         button.addEventListener('click', () => {
-            const fps = button.getAttribute('data-fps');
-            syncFpsControls(fps);
-            saveSettings();
+            syncFpsControls(button.dataset.fps);
+            saveSiteSettings();
         });
+    });
+
+    elements.addSiteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newDomain = elements.newSiteDomainInput.value.trim();
+        if (newDomain && !autoModeConfigs.some(c => c.domain === newDomain)) {
+            autoModeConfigs.push({ domain: newDomain, fps: 60 });
+            elements.newSiteDomainInput.value = '';
+            renderAutoModeList();
+            saveAutoModeList();
+        }
+    });
+
+    elements.autoModeListEl.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const index = parseInt(e.target.dataset.index, 10);
+            autoModeConfigs.splice(index, 1);
+            renderAutoModeList();
+            saveAutoModeList();
+        }
+    });
+
+    elements.autoModeListEl.addEventListener('change', (e) => {
+         if (e.target.tagName === 'INPUT') {
+            const index = parseInt(e.target.dataset.index, 10);
+            let newFps = parseInt(e.target.value, 10);
+            if (isNaN(newFps) || newFps < 1) newFps = 1;
+            autoModeConfigs[index].fps = newFps;
+            saveAutoModeList();
+        }
     });
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0] && tabs[0].url) {
             try {
                 const url = new URL(tabs[0].url);
-                if (['http:', 'https:'].includes(url.protocol)) {
+                if (url.protocol.startsWith('http')) {
                     currentHost = url.hostname;
                 }
             } catch (e) {}
         }
-        currentSiteLabel.textContent = `Trang: ${currentHost}`;
-        loadSettings();
+        elements.currentSiteLabel.textContent = `Trang: ${currentHost}`;
+        loadSettingsForCurrentTab();
     });
 });
