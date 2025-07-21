@@ -1,22 +1,3 @@
-// Biến chứa mã nguồn của class FPSLimiter dưới dạng hàm để tiêm vào trang.
-const fpsLimiterInjector = (initialConfig) => {
-    if (window.myFpsLimiter) {
-        window.myFpsLimiter.update(initialConfig);
-        return;
-    }
-    class FPSLimiter {
-        constructor(cfg) { this.originalRAF = window.requestAnimationFrame; this.lastFrameTime = -Infinity; this.isIframe = window.self !== window.top; this.update(cfg); this.listenForMessages(); }
-        update(cfg) { this.config = cfg; if (this.isIframe && !this.config.applyInFrames) { this.uninstall(); return; } this.frameInterval = 1000 / (this.config.value > 0 ? this.config.value : 60); this.install(); }
-        install() { if (this.config.enabled) { const r = this.throttledRAF.bind(this); r.toString = () => this.originalRAF.toString(); window.requestAnimationFrame = r; } else { this.uninstall(); } }
-        uninstall() { window.requestAnimationFrame = this.originalRAF; }
-        throttledRAF(cb) { const t = performance.now(), e = t - this.lastFrameTime, d = this.frameInterval - e; const exec = () => { try { cb(performance.now()); } catch (err) { console.error("FPS Limiter:", err); } }; if (d <= 0) { this.lastFrameTime = t; exec(); } else { setTimeout(exec, d); } }
-        listenForMessages() { chrome.runtime.onMessage.addListener((msg) => { if (msg.type === 'UPDATE_CONFIG') { this.update(msg.config); } }); }
-    }
-    window.myFpsLimiter = new FPSLimiter(initialConfig);
-};
-
-// --- LOGIC CỦA SERVICE WORKER ---
-
 let settingsCache = {};
 
 async function loadAndCacheSettings() {
@@ -36,7 +17,7 @@ function getConfigForUrl(url, tabIsActive, tabIsAudible) {
     try {
         const host = new URL(url).hostname;
         if (settingsCache.autoModeMasterEnable) {
-            if (!tabIsActive && tabIsAudible) return { enabled: true, value: 5 }; // Tối ưu tài nguyên nền
+            if (!tabIsActive && tabIsAudible) return { enabled: true, value: 5 };
             const autoConfig = settingsCache.autoModeConfigs.find(c => host.includes(c.domain));
             if (autoConfig) return { enabled: true, value: autoConfig.fps };
         }
@@ -50,25 +31,9 @@ function getConfigForUrl(url, tabIsActive, tabIsAudible) {
 
 async function updateTab(tab) {
     if (!tab || !tab.id || !tab.url || !tab.url.startsWith('http')) return;
-    if (settingsCache.globalDisabled) return;
-
     const config = getConfigForUrl(tab.url, tab.active, tab.audible);
-
-    try {
-        await chrome.tabs.sendMessage(tab.id, { type: 'UPDATE_CONFIG', config });
-    } catch (e) {
-        if (e.message.includes('Receiving end does not exist')) {
-            chrome.scripting.executeScript({
-                target: { tabId: tab.id, allFrames: settingsCache.applyInFrames },
-                func: fpsLimiterInjector,
-                args: [config],
-                world: 'MAIN',
-            }).catch(err => {});
-        }
-    }
+    chrome.tabs.sendMessage(tab.id, { type: 'UPDATE_CONFIG', config }).catch(() => {});
 }
-
-// --- LISTENERS ĐÃ ĐƯỢC TỐI ƯU ---
 
 chrome.storage.onChanged.addListener(async () => {
     await loadAndCacheSettings();
@@ -78,16 +43,13 @@ chrome.storage.onChanged.addListener(async () => {
     }
 });
 
-const tabUpdateHandler = (tabId) => {
-    chrome.tabs.get(tabId, (tab) => {
-        if (chrome.runtime.lastError) return;
-        updateTab(tab);
-    }).catch(()=>{});
-};
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    const tab = await chrome.tabs.get(activeInfo.tabId);
+    updateTab(tab);
+});
 
-chrome.tabs.onActivated.addListener(activeInfo => tabUpdateHandler(activeInfo.tabId));
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete' || changeInfo.audible !== undefined) {
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    if (changeInfo.audible !== undefined) {
         updateTab(tab);
     }
 });
