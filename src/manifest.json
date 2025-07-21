@@ -1,14 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "FPS Limiter Pro",
-  "version": "5.0.0",
-  "description": "Phiên bản nâng cấp kiến trúc để sửa lỗi build.",
-  "permissions": [ "storage", "scripting", "tabs" ],
+  "name": "FPS Limiter Pro (Webpack)",
+  "version": "1.0.0",
+  "description": "Giới hạn FPS với kiến trúc Webpack ổn định.",
+  "permissions": [ "storage", "tabs" ],
   "host_permissions": [ "<all_urls>" ],
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
   "action": {
     "default_popup": "popup/popup.html"
   },
