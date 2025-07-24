@@ -8,7 +8,7 @@ module.exports = {
   entry: {
     background: './src/background.js',
     popup: './src/popup/popup.js',
-    content: './src/content.js', // Thêm content script làm điểm vào
+    content: './src/content.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
