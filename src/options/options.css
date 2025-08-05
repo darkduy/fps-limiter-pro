@@ -1,0 +1,67 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+    color: #1c1e21;
+    margin: 0;
+    padding: 2rem;
+}
+.wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+header {
+    text-align: center;
+}
+header h1 {
+    margin-bottom: 0.5rem;
+}
+header p {
+    margin-top: 0;
+    color: #606770;
+}
+.settings-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+.settings-card h2 {
+    margin-top: 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e4e6eb;
+}
+.form-row, .form-row-vertical {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.form-row-vertical {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+label {
+    font-weight: 500;
+}
+input[type="checkbox"] {
+    transform: scale(1.2);
+}
+select, textarea {
+    width: 100%;
+    background-color: #f0f2f5;
+    color: #1c1e21;
+    border: 1px solid #ccd0d5;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 1rem;
+}
+textarea {
+    resize: vertical;
+}
