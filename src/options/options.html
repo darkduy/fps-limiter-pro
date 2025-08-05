@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FPS Limiter Pro - Cài đặt</title>
+    <link rel="stylesheet" href="options.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1>Cài đặt FPS Limiter Pro</h1>
+            <p>Quản lý tất cả các tính năng nâng cao tại đây.</p>
+        </header>
+        <main>
+            <div class="settings-card">
+                <h2>Cài đặt chung</h2>
+                <div class="form-row">
+                    <label for="applyInFrames">Áp dụng cho iFrame</label>
+                    <input type="checkbox" id="applyInFrames">
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h2>Chế độ Ngủ đông Tab (Tiết kiệm RAM)</h2>
+                <div class="form-row">
+                    <label for="suspenderEnable">Bật tính năng</label>
+                    <input type="checkbox" id="suspenderEnable">
+                </div>
+                <div class="form-row">
+                    <label for="suspenderTimeout">Ngủ đông sau:</label>
+                    <select id="suspenderTimeout">
+                        <option value="15">15 phút</option>
+                        <option value="30">30 phút</option>
+                        <option value="60">1 giờ</option>
+                        <option value="120">2 giờ</option>
+                    </select>
+                </div>
+                <div class="form-row-vertical">
+                    <label for="suspenderWhitelist">Không ngủ đông các trang (mỗi trang một dòng):</label>
+                    <textarea id="suspenderWhitelist" rows="5" placeholder="krunker.io&#10;youtube.com"></textarea>
+                </div>
+            </div>
+            </main>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>
