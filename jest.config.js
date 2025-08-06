@@ -1,10 +1,13 @@
+// jest.config.js
 module.exports = {
   roots: ['<rootDir>/src'],
   preset: 'ts-jest',
   testEnvironment: 'node',
-  // Thêm mục 'transform' để đảm bảo ts-jest được sử dụng
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  
+  // THÊM MỤC NÀY ĐỂ SỬA LỖI:
+  // Đảm bảo ts-jest xử lý tất cả các tệp .ts/.tsx mà nó gặp phải
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
-    setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   },
 };
