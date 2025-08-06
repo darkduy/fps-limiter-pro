@@ -1,5 +1,4 @@
 // src/types.ts
-
 export interface SiteConfig {
   enabled: boolean;
   value: number;
@@ -10,12 +9,26 @@ export interface AutoModeConfig {
   fps: number;
 }
 
+export interface ProfileSettings {
+  globalConfig: SiteConfig;
+  autoModeConfigs: AutoModeConfig[];
+}
+
+export interface Profile {
+  id: string;
+  name: string;
+  settings: ProfileSettings;
+}
+
 export interface SettingsCache {
-  [key: string]: any; // Cho phép các key động cho cài đặt từng trang
+  [key: string]: any;
   globalDisabled?: boolean;
   autoModeMasterEnable?: boolean;
   applyInFrames?: boolean;
-  globalConfig?: SiteConfig;
-  autoModeConfigs?: AutoModeConfig[];
   heavyHosts?: string[];
+  profiles?: Profile[];
+  activeProfileId?: string | null;
+  suspenderEnable?: boolean;
+  suspenderTimeout?: number;
+  suspenderWhitelist?: string[];
 }
