@@ -2,20 +2,33 @@
 import { getConfigForUrl } from './background';
 import type { SettingsCache, Profile, ProfileSettings } from './types';
 
-// Mock (giả lập) các API của Chrome vì chúng không tồn tại trong môi trường test Jest
-// @ts-ignore
+// Mock chrome API đầy đủ hơn để khớp với kiểu dữ liệu
 global.chrome = {
   storage: {
     local: {
       get: jest.fn().mockResolvedValue({}),
+      set: jest.fn().mockResolvedValue(undefined),
+      clear: jest.fn().mockResolvedValue(undefined),
+      remove: jest.fn().mockResolvedValue(undefined),
+      getBytesInUse: jest.fn().mockResolvedValue(0),
     },
   },
-};
+} as any;
 
 describe('getConfigForUrl Logic', () => {
   let settingsCache: SettingsCache;
   let activeProfile: Profile | null;
 
+  beforeEach(() => {
+    // Thiết lập dữ liệu mẫu trước mỗi bài test
+    const defaultSettings: ProfileSettings = {
+      globalConfig: { enabled: true, value: 60 },
+      autoModeConfigs: [{ domain: 'game.com', fps: 144 }],
+    };
+    activeProfile = { id: '1', name: 'Default', settings: defaultSettings };
+    settingsCache = { autoModeMasterEnable: true };
+  });
+  
   // Thiết lập dữ liệu mẫu trước mỗi bài test
   beforeEach(() => {
     const defaultSettings: ProfileSettings = {
