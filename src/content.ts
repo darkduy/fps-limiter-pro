@@ -59,16 +59,27 @@ class FPSLimiter {
 
     private uninstall(): void { window.requestAnimationFrame = this.originalRAF; }
 
-    private throttledRAF(cb: FrameRequestCallback): void {
-        const t = performance.now(), e = t - this.lastFrameTime, d = this.frameInterval - e;
-        const exec = (): void => {
-            const startTime = performance.now();
-            try { cb(startTime); } catch (err) {}
-            const endTime = performance.now();
-            this.analyzeFrame(endTime - startTime);
-        };
-        if (d <= 0) { this.lastFrameTime = t; exec(); } else { setTimeout(exec, d); }
+private throttledRAF(cb: FrameRequestCallback): number { // Thay đổi: : void -> : number
+    const t = performance.now();
+    const e = t - this.lastFrameTime;
+    const d = this.frameInterval - e;
+
+    const exec = (): void => {
+        const startTime = performance.now();
+        try { cb(startTime); } catch (err) {}
+        const endTime = performance.now();
+        this.analyzeFrame(endTime - startTime);
+    };
+
+    if (d <= 0) {
+        this.lastFrameTime = t;
+        // Sửa lại: Gọi hàm gốc để thực thi và trả về ID
+        return this.originalRAF.call(window, exec);
+    } else {
+        // Sửa lại: Trả về ID của setTimeout
+        return setTimeout(exec, d);
     }
+}
 
     private analyzeFrame(duration: number): void {
         if (this.isPageFlagged || this.isIframe) return;
