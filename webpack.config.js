@@ -18,48 +18,20 @@ module.exports = {
     filename: '[name].js',
     clean: true,
   },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
+  resolve: { extensions: ['.tsx', '.ts', '.js'] },
   module: {
     rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
-      },
+      { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
+      { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
     ],
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: (chunkData) => {
-        return chunkData.chunk.name === 'popup' ? 'popup/popup.css' : 'options.css';
-      }
+      filename: (chunkData) => chunkData.chunk.name === 'popup' ? 'popup/popup.css' : 'options.css',
     }),
-    new CopyPlugin({
-      patterns: [
-        { from: 'src/manifest.json', to: 'manifest.json' },
-        { from: 'public', to: '.' },
-      ],
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/popup/popup.html',
-      filename: 'popup/popup.html',
-      chunks: ['popup'],
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/options/options.html',
-      filename: 'options.html',
-      chunks: ['options'],
-    }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      reportFilename: 'bundle_report.html',
-      openAnalyzer: false,
-    }),
+    new CopyPlugin({ patterns: [{ from: 'src/manifest.json', to: 'manifest.json' }, { from: 'public', to: '.' }] }),
+    new HtmlWebpackPlugin({ template: './src/popup/popup.html', filename: 'popup/popup.html', chunks: ['popup'] }),
+    new HtmlWebpackPlugin({ template: './src/options/options.html', filename: 'options.html', chunks: ['options'] }),
+    new BundleAnalyzerPlugin({ analyzerMode: 'static', reportFilename: 'bundle_report.html', openAnalyzer: false }),
   ],
 };
