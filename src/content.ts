@@ -31,7 +31,8 @@ class FPSLimiter {
     private getConfigForUrl(host: string, tabIsActive: boolean, tabIsAudible: boolean): SiteConfig {
         if (this.settingsCache.autoModeMasterEnable) {
             if (!tabIsActive && tabIsAudible) return { enabled: true, value: 5 };
-            const autoConfig = (this.settingsCache.autoModeConfigs || []).find(c => host.includes(c.domain));
+            // Thêm kiểu dữ liệu cho 'c' để sửa lỗi implicit any
+            const autoConfig = (this.settingsCache.autoModeConfigs || []).find((c: AutoModeConfig) => host.includes(c.domain));
             if (autoConfig) return { enabled: true, value: autoConfig.fps };
         }
         const siteConfig = this.settingsCache[host];
@@ -59,27 +60,21 @@ class FPSLimiter {
 
     private uninstall(): void { window.requestAnimationFrame = this.originalRAF; }
 
-private throttledRAF(cb: FrameRequestCallback): number { // Thay đổi: : void -> : number
-    const t = performance.now();
-    const e = t - this.lastFrameTime;
-    const d = this.frameInterval - e;
-
-    const exec = (): void => {
-        const startTime = performance.now();
-        try { cb(startTime); } catch (err) {}
-        const endTime = performance.now();
-        this.analyzeFrame(endTime - startTime);
-    };
-
-    if (d <= 0) {
-        this.lastFrameTime = t;
-        // Sửa lại: Gọi hàm gốc để thực thi và trả về ID
-        return this.originalRAF.call(window, exec);
-    } else {
-        // Sửa lại: Trả về ID của setTimeout
-        return setTimeout(exec, d);
+private throttledRAF(cb: FrameRequestCallback): number { // Trả về number
+        const t = performance.now(), e = t - this.lastFrameTime, d = this.frameInterval - e;
+        const exec = (): void => {
+            const startTime = performance.now();
+            try { cb(startTime); } catch (err) {}
+            const endTime = performance.now();
+            this.analyzeFrame(endTime - startTime);
+        };
+        if (d <= 0) {
+            this.lastFrameTime = t;
+            return this.originalRAF.call(window, exec);
+        } else {
+            return setTimeout(exec, d);
+        }
     }
-}
 
     private analyzeFrame(duration: number): void {
         if (this.isPageFlagged || this.isIframe) return;
