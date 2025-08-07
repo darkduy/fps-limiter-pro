@@ -3,6 +3,10 @@
     "target": "ESNext",
     "module": "ESNext",
     "strict": true,
+    // THÊM DÒNG NÀY:
+    // Báo cho TypeScript biết chúng ta cần các kiểu dữ liệu của trình duyệt
+    "lib": ["ESNext", "DOM"],
+    
     "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
