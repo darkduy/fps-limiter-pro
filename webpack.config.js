@@ -27,10 +27,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-        filename: (chunkData) => {
-            if (chunkData.chunk.name === 'popup') return 'popup/popup.css';
-            return 'options.css';
-        }
+      filename: (chunkData) => (chunkData.chunk.name === 'popup' ? 'popup/popup.css' : 'options.css'),
     }),
     new CopyPlugin({ patterns: [{ from: 'src/manifest.json', to: 'manifest.json' }, { from: 'public', to: '.' }] }),
     new HtmlWebpackPlugin({ template: './src/popup/popup.html', filename: 'popup/popup.html', chunks: ['popup'] }),
