@@ -1,14 +1,18 @@
-import type { SiteConfig, AutoModeConfig } from './types';
+import type { SiteConfig, AutoModeConfig, SettingsCache } from './types';
 
 class FPSLimiter {
     private originalRAF: (callback: FrameRequestCallback) => number;
     private lastFrameTime: number = -Infinity;
     private isIframe: boolean;
     private config: SiteConfig = { enabled: false, value: 60 };
-    private settingsCache: { [key: string]: any; autoModeConfigs?: AutoModeConfig[] } = {};
+    private settingsCache: SettingsCache = {};
     private frameInterval: number = 1000 / 60;
     
-    // ... các thuộc tính khác giữ nguyên ...
+    private frameDurations: number[] = [];
+    private durationSum: number = 0;
+    private readonly maxSamples: number = 120;
+    private readonly heavyAvgThreshold: number = 8;
+    private isPageFlagged: boolean = false;
 
     constructor() {
         this.originalRAF = window.requestAnimationFrame;
@@ -21,7 +25,7 @@ class FPSLimiter {
         const host = window.location.hostname || 'global';
         const config = this.getConfigForUrl(host, true, false);
         this.update(config);
-        this.listenForMessages();
+        this.listenForMessages(); // Gọi hàm này
     }
     
     private getConfigForUrl(host: string, tabIsActive: boolean, tabIsAudible: boolean): SiteConfig {
@@ -48,7 +52,7 @@ class FPSLimiter {
             const r = this.throttledRAF.bind(this);
             // @ts-ignore
             r.toString = () => this.originalRAF.toString();
-            window.requestAnimationFrame = r;
+            window.requestAnimationFrame = r as any;
         } else {
             this.uninstall();
         }
@@ -68,11 +72,34 @@ class FPSLimiter {
             this.lastFrameTime = t;
             return this.originalRAF.call(window, exec);
         } else {
-            return setTimeout(exec, d);
+            return window.setTimeout(exec, d);
+        }
+    }
+
+    // Đảm bảo hàm này nằm trong class
+    private analyzeFrame(duration: number): void {
+        if (this.isPageFlagged || this.isIframe) return;
+        this.frameDurations.push(duration);
+        this.durationSum += duration;
+        if (this.frameDurations.length > this.maxSamples) {
+            this.durationSum -= this.frameDurations.shift()!;
+        }
+        if (this.frameDurations.length < this.maxSamples) return;
+        const avg = this.durationSum / this.frameDurations.length;
+        if (avg > this.heavyAvgThreshold) {
+            this.isPageFlagged = true;
+            chrome.runtime.sendMessage({ type: 'PAGE_IS_HEAVY' });
         }
     }
     
-    // ... các hàm còn lại giữ nguyên
+    // Đảm bảo hàm này nằm trong class
+    private listenForMessages(): void {
+      chrome.runtime.onMessage.addListener((message: any) => {
+        if (message.type === 'UPDATE_CONFIG') {
+          this.update(message.config);
+        }
+      });
+    }
 }
 
 new FPSLimiter();
