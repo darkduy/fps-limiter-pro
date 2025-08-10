@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    # THÊM KHỐI NÀY ĐỂ CẤP QUYỀN GHI
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,16 +29,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # Sửa lại thành 'npm install' để nó có thể cập nhật package-lock.json
         run: npm install
 
-      # BƯỚC MỚI: Tự động commit nếu package-lock.json thay đổi
       - name: Auto-commit package-lock.json changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(ci): Update package-lock.json"
           file_pattern: "package-lock.json"
-          # Tùy chọn: Đặt tên và email cho bot commit
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "actions@github.com"
 
