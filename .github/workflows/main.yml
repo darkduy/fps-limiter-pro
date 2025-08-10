@@ -1,6 +1,6 @@
 # .github/workflows/main.yml
 
-name: Build and Test Chrome Extension
+name: Build, Test, and Sync Lockfile
 
 on:
   push:
@@ -10,9 +10,9 @@ on:
 
 jobs:
   build_and_test:
-    name: Build & Test # Tên job rõ ràng hơn
+    name: Build & Test
     runs-on: ubuntu-latest
-    timeout-minutes: 10 # Thêm thời gian chờ tối đa cho job
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -25,7 +25,18 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        # Sửa lại thành 'npm install' để nó có thể cập nhật package-lock.json
+        run: npm install
+
+      # BƯỚC MỚI: Tự động commit nếu package-lock.json thay đổi
+      - name: Auto-commit package-lock.json changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(ci): Update package-lock.json"
+          file_pattern: "package-lock.json"
+          # Tùy chọn: Đặt tên và email cho bot commit
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "actions@github.com"
 
       - name: Run Jest tests
         run: npm test
@@ -33,9 +44,7 @@ jobs:
       - name: Build extension
         run: npm run build
 
-      # CẢI TIẾN: Các bước sau chỉ chạy trên nhánh 'main'
       - name: Package extension
-        # 'if' statement đảm bảo bước này chỉ chạy khi push/merge vào main
         if: github.ref == 'refs/heads/main'
         run: zip -r extension-build.zip dist
 
