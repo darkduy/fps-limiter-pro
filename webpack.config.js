@@ -4,9 +4,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
+// Xác định môi trường dựa trên cờ --mode của webpack
+const isProduction = process.env.NODE_ENV === 'production';
+
 module.exports = {
-  mode: 'production',
-  devtool: 'source-map',
+  mode: isProduction ? 'production' : 'development',
+  devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
+  
   entry: {
     background: './src/background.ts',
     popup: './src/popup/popup.ts',
@@ -32,6 +36,12 @@ module.exports = {
     new CopyPlugin({ patterns: [{ from: 'src/manifest.json', to: 'manifest.json' }, { from: 'public', to: '.' }] }),
     new HtmlWebpackPlugin({ template: './src/popup/popup.html', filename: 'popup/popup.html', chunks: ['popup'] }),
     new HtmlWebpackPlugin({ template: './src/options/options.html', filename: 'options.html', chunks: ['options'] }),
-    new BundleAnalyzerPlugin({ analyzerMode: 'static', reportFilename: 'bundle_report.html', openAnalyzer: false }),
-  ],
+    
+    // Chỉ chạy Bundle Analyzer khi build production
+    isProduction && new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      reportFilename: 'bundle_report.html',
+      openAnalyzer: false,
+    }),
+  ].filter(Boolean), // Lọc ra các giá trị 'false' (như khi isProduction là false)
 };
