@@ -1,27 +1,17 @@
 {
   "compilerOptions": {
-    // --- Cơ bản ---
     "target": "ESNext",
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
-    "outDir": "./dist", // Chỉ định thư mục đầu ra (dù Webpack sẽ ghi đè)
-    "sourceMap": true,  // Tạo source map để gỡ lỗi tốt hơn
-
-    // --- Module Resolution ---
+    "outDir": "./dist",
+    "sourceMap": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "esModuleInterop": true, // Tương thích tốt hơn với các module CommonJS
-
-    // --- Quy tắc nghiêm ngặt ---
+    "esModuleInterop": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true // Bỏ qua kiểm tra kiểu của các file .d.ts
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*" // Chỉ biên dịch các file trong thư mục src
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts" // Loại bỏ các file test khỏi quá trình build chính
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts"]
 }
