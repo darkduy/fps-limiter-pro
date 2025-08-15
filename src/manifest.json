@@ -1,9 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "FPS Limiter Pro",
-  "version": "1.0.0",
-  "description": "Advanced FPS Limiter with profiles, smart optimization, and tab suspension.",
-  "permissions": [ "storage", "tabs", "alarms" ],
+  "name": "FPS Limiter Pro Max",
+  "version": "2.0.0",
+  "description": "Ultimate FPS control with AI-powered optimization, profiles, adaptive performance, and advanced tab management.",
+  "permissions": [ 
+    "storage", 
+    "tabs", 
+    "alarms", 
+    "system.cpu", 
+    "system.memory", 
+    "idle",
+    "notifications",
+    "activeTab"
+  ],
   "host_permissions": [ "<all_urls>" ],
   "background": {
     "service_worker": "background.js"
@@ -23,9 +32,31 @@
     "page": "options.html",
     "open_in_tab": true
   },
+  "commands": {
+    "toggle_fps_limiter": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "Toggle FPS Limiter on/off"
+    },
+    "cycle_fps_preset": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Q",
+        "mac": "Command+Shift+Q"
+      },
+      "description": "Cycle through FPS presets"
+    }
+  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["injected.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
