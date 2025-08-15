@@ -13,6 +13,7 @@
     "dev": "webpack --mode=development --watch",
     "build": "webpack --mode=production",
     "test": "jest",
+    "release": "node support/release.js",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\""
