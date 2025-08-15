@@ -6,7 +6,7 @@ import type { SettingsCache } from '../types';
  * Rất hữu ích cho các sự kiện input, slider để tránh gọi API lưu trữ quá nhiều lần.
  */
 export function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
-  let timeout: number;
+  let timeout: ReturnType<typeof setTimeout>;
   return (...args: Parameters<F>): void => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), waitFor);
