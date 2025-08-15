@@ -1,6 +1,6 @@
 # .github/workflows/main.yml
 
-name: Build, Test, and Sync Lockfile
+name: Build and Test Extension
 
 on:
   push:
@@ -12,9 +12,6 @@ jobs:
   build_and_test:
     name: Build & Test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    # THÊM KHỐI NÀY ĐỂ CẤP QUYỀN GHI
     permissions:
       contents: write
 
@@ -36,8 +33,6 @@ jobs:
         with:
           commit_message: "chore(ci): Update package-lock.json"
           file_pattern: "package-lock.json"
-          commit_user_name: "GitHub Actions Bot"
-          commit_user_email: "actions@github.com"
 
       - name: Run Jest tests
         run: npm test
@@ -45,13 +40,8 @@ jobs:
       - name: Build extension
         run: npm run build
 
-      - name: Package extension
-        if: github.ref == 'refs/heads/main'
-        run: zip -r extension-build.zip dist
-
       - name: Upload build artifact
-        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: extension-package
-          path: extension-build.zip
+          path: dist
