@@ -1,14 +1,152 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FPS Limiter Settings</title>
+  <title>FPS Limiter Pro Max</title>
   <link rel="stylesheet" href="./popup.css"> 
   <meta charset="UTF-8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <script src="./popup.js" type="module"></script>
-</body>
-</html>
+  <div class="container">
+    <!-- Header with current site and status -->
+    <div class="header-section">
+      <div class="site-info">
+        <div id="currentSite" class="site-name">Loading...</div>
+        <div id="siteStatus" class="site-status">
+          <span class="status-indicator" id="statusIndicator"></span>
+          <span class="status-text" id="statusText">Active</span>
+        </div>
+      </div>
+      <div class="master-controls">
+        <label class="switch">
+          <input type="checkbox" id="masterDisable">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="main-controls">
+      <!-- AI Recommendations Panel -->
+      <div class="setting-group ai-panel" id="aiPanel" style="display: none;">
+        <div class="ai-header">
+          <span class="ai-icon">🤖</span>
+          <h3>AI Recommendations</h3>
+          <button class="close-btn" id="closeAI">×</button>
+        </div>
+        <div class="ai-recommendations" id="aiRecommendations">
+          <!-- AI recommendations will be populated here -->
+        </div>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="setting-group">
+        <div class="section-header">
+          <h3>Quick Presets</h3>
+          <button class="ai-trigger" id="showAI" title="AI Recommendations">🤖</button>
+        </div>
+        <div class="preset-grid" id="presetGrid">
+          <!-- Presets will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Current FPS Settings -->
+      <div class="setting-group">
+        <div class="section-header">
+          <h3>FPS Control</h3>
+          <div class="fps-display" id="currentFPS">60</div>
+        </div>
+        
+        <div class="setting-row">
+          <label for="enabledCheckbox">Enable FPS Limit</label>
+          <label class="switch">
+            <input type="checkbox" id="enabledCheckbox" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="fps-controls">
+          <input type="range" id="fpsSlider" min="1" max="240" value="60" step="1">
+          <input type="number" id="fpsInput" min="1" max="240" value="60">
+        </div>
+        
+        <div class="fps-info">
+          <span class="fps-label">1 FPS</span>
+          <span class="fps-label center" id="adaptiveIndicator">Adaptive</span>
+          <span class="fps-label">240 FPS</span>
+        </div>
+      </div>
+
+      <!-- Profile Management -->
+      <div class="setting-group">
+        <div class="section-header">
+          <h3>Profiles</h3>
+          <button class="add-btn" id="addProfile">+ New</button>
+        </div>
+        <div class="profile-selector">
+          <select id="profileSelect">
+            <option value="">Select Profile...</option>
+          </select>
+          <div class="profile-actions">
+            <button id="editProfile" title="Edit Profile">✏️</button>
+            <button id="deleteProfile" title="Delete Profile">🗑️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Features -->
+      <div class="setting-group">
+        <div class="section-header">
+          <h3>Smart Features</h3>
+          <div class="feature-indicators">
+            <span class="indicator" id="adaptiveIndicator" title="Adaptive Mode">🧠</span>
+            <span class="indicator" id="gameIndicator" title="Game Mode">🎮</span>
+            <span class="indicator" id="batteryIndicator" title="Battery Mode">🔋</span>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <label for="adaptiveMode">Adaptive Optimization</label>
+          <label class="switch">
+            <input type="checkbox" id="adaptiveMode" checked>
+            <span class="slider adaptive-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <label for="autoModeMasterEnable">Auto Site Detection</label>
+          <label class="switch">
+            <input type="checkbox" id="autoModeMasterEnable" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <label for="gamingMode">Gaming Mode</label>
+          <label class="switch">
+            <input type="checkbox" id="gamingMode">
+            <span class="slider gaming-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Performance Monitor -->
+      <div class="setting-group performance-monitor" id="performanceMonitor">
+        <h3>Performance</h3>
+        <div class="metrics-grid">
+          <div class="metric">
+            <span class="metric-label">FPS</span>
+            <span class="metric-value" id="realTimeFPS">--</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Frame Time</span>
+            <span class="metric-value" id="frameTime">--ms</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Jank</span>
+            <span class="metric-value" id="jankFrames">--</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Power</span>
+            <span class="metric-value" id="powerUs
