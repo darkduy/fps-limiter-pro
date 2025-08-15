@@ -3,25 +3,17 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-
-// Xác định môi trường dựa trên cờ --mode của webpack
 const isProduction = process.env.NODE_ENV === 'production';
-
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
-  
   entry: {
     background: './src/background.ts',
     popup: './src/popup/popup.ts',
     content: './src/content.ts',
     options: './src/options/options.ts',
   },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-    clean: true,
-  },
+  output: { path: path.resolve(__dirname, 'dist'), filename: '[name].js', clean: true },
   resolve: { extensions: ['.tsx', '.ts', '.js'] },
   module: {
     rules: [
@@ -30,18 +22,10 @@ module.exports = {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: (chunkData) => (chunkData.chunk.name === 'popup' ? 'popup/popup.css' : 'options.css'),
-    }),
+    new MiniCssExtractPlugin({ filename: (chunkData) => (chunkData.chunk.name === 'popup' ? 'popup/popup.css' : 'options.css') }),
     new CopyPlugin({ patterns: [{ from: 'src/manifest.json', to: 'manifest.json' }, { from: 'public', to: '.' }] }),
     new HtmlWebpackPlugin({ template: './src/popup/popup.html', filename: 'popup/popup.html', chunks: ['popup'] }),
     new HtmlWebpackPlugin({ template: './src/options/options.html', filename: 'options.html', chunks: ['options'] }),
-    
-    // Chỉ chạy Bundle Analyzer khi build production
-    isProduction && new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      reportFilename: 'bundle_report.html',
-      openAnalyzer: false,
-    }),
-  ].filter(Boolean), // Lọc ra các giá trị 'false' (như khi isProduction là false)
+    isProduction && new BundleAnalyzerPlugin({ analyzerMode: 'static', reportFilename: 'bundle_report.html', openAnalyzer: false }),
+  ].filter(Boolean),
 };
