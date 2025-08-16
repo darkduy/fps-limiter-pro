@@ -149,4 +149,94 @@
           </div>
           <div class="metric">
             <span class="metric-label">Power</span>
-            <span class="metric-value" id="powerUs
+            <span class="metric-value" id="powerUsage">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Site Configuration -->
+      <div class="setting-group">
+        <h3>Site Settings</h3>
+        
+        <div class="setting-row">
+          <label for="applyGlobal">Use Global Settings</label>
+          <label class="switch">
+            <input type="checkbox" id="applyGlobal" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="auto-mode-section" id="autoModeSection">
+          <div class="section-header">
+            <span>Auto-Detected Sites</span>
+            <button class="expand-btn" id="toggleAutoMode">▼</button>
+          </div>
+          <div class="auto-mode-content" id="autoModeContent">
+            <ul class="auto-mode-list" id="autoModeList"></ul>
+            <form class="add-site-form" id="addSiteForm">
+              <input type="text" id="newSiteDomain" placeholder="Enter domain (e.g., example.com)" required>
+              <button type="submit">Add Site</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heavy Page Notification -->
+      <div class="notification heavy-page-notification" id="heavyPageNotification" style="display: none;">
+        <div class="notification-content">
+          <span class="notification-icon">⚠️</span>
+          <div class="notification-text">
+            <strong>Heavy Page Detected</strong>
+            <span>This page may benefit from FPS limiting</span>
+          </div>
+          <button class="notification-action" id="addToAutoListBtn">Optimize</button>
+        </div>
+      </div>
+
+      <!-- Game Detection Notification -->
+      <div class="notification game-notification" id="gameNotification" style="display: none;">
+        <div class="notification-content">
+          <span class="notification-icon">🎮</span>
+          <div class="notification-text">
+            <strong>Game Detected</strong>
+            <span id="gameTypeText">Optimizing for gaming performance</span>
+          </div>
+          <button class="notification-action" id="acceptGameMode">Apply</button>
+        </div>
+      </div>
+
+      <!-- Battery Warning -->
+      <div class="notification battery-warning" id="batteryWarning" style="display: none;">
+        <div class="notification-content">
+          <span class="notification-icon">🔋</span>
+          <div class="notification-text">
+            <strong>Low Battery</strong>
+            <span>Consider enabling battery optimization</span>
+          </div>
+          <button class="notification-action" id="enableBatteryMode">Enable</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer with shortcuts and settings -->
+    <div class="footer-section">
+      <div class="shortcuts">
+        <span class="shortcut-hint">Ctrl+Shift+F to toggle • Ctrl+Shift+Q for presets</span>
+      </div>
+      <div class="footer-actions">
+        <button class="footer-btn" id="openOptions" title="Advanced Settings">⚙️</button>
+        <button class="footer-btn" id="exportSettings" title="Export Settings">📤</button>
+        <button class="footer-btn" id="resetSettings" title="Reset to Defaults">🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <span>Loading AI recommendations...</span>
+  </div>
+
+  <script src="./popup.js" type="module"></script>
+</body>
+</html>
