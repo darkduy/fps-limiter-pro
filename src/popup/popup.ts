@@ -539,4 +539,532 @@ class EnhancedPopupManager {
         setTimeout(() => targetBtn?.classList.remove('active'), 1000);
     }
 
-    private async applyAIRecommendation(recommendation: AIRecommendation): Promise<void>
+    private async applyAIRecommendation(recommendation: AIRecommendation): Promise<void> {
+        try {
+            switch (recommendation.type) {
+                case 'fps':
+                    this.syncFpsControls(recommendation.value.toString());
+                    this.updateFpsDisplay(recommendation.value);
+                    this.saveSiteSettings();
+                    break;
+                    
+                case 'setting':
+                    await chrome.storage.local.set(recommendation.value);
+                    await this.loadAllSettings();
+                    break;
+                    
+                case 'profile':
+                    // Switch to recommended profile
+                    if (this.elements.profileSelect) {
+                        (this.elements.profileSelect as HTMLSelectElement).value = recommendation.value.id;
+                        await this.switchProfile({ target: this.elements.profileSelect } as any);
+                    }
+                    break;
+            }
+            
+            this.showNotification(`🤖 ${recommendation.title} applied`);
+            
+            // Remove applied recommendation
+            this.aiRecommendations = this.aiRecommendations.filter(r => r !== recommendation);
+            this.renderAIRecommendations();
+            
+        } catch (error) {
+            console.error('Error applying AI recommendation:', error);
+            this.showError('Failed to apply recommendation');
+        }
+    }
+
+    private showAIPanel(): void {
+        if (this.elements.aiPanel) {
+            this.elements.aiPanel.style.display = 'block';
+            this.elements.aiPanel.classList.add('fade-in');
+            
+            // Load fresh recommendations
+            this.loadAIRecommendations();
+        }
+    }
+
+    private hideAIPanel(): void {
+        if (this.elements.aiPanel) {
+            this.elements.aiPanel.classList.add('fade-out');
+            setTimeout(() => {
+                this.elements.aiPanel!.style.display = 'none';
+                this.elements.aiPanel!.classList.remove('fade-out', 'fade-in');
+            }, 300);
+        }
+    }
+
+    private toggleAutoModeContent(): void {
+        const content = this.elements.autoModeContent;
+        const toggleBtn = this.elements.toggleAutoMode;
+        
+        if (content && toggleBtn) {
+            const isExpanded = content.classList.contains('expanded');
+            
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                toggleBtn.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                toggleBtn.textContent = '▲';
+            }
+        }
+    }
+
+    private handleAddSite(e: SubmitEvent): void {
+        e.preventDefault();
+        
+        const input = this.elements.newSiteDomain as HTMLInputElement;
+        const newDomain = input.value.trim().toLowerCase();
+        
+        if (!newDomain) return;
+        
+        // Validate domain format
+        if (!this.isValidDomain(newDomain)) {
+            this.showError('Please enter a valid domain (e.g., example.com)');
+            return;
+        }
+        
+        // Check if already exists
+        if (this.autoModeConfigs.some(c => c.domain === newDomain)) {
+            this.showError('Domain already exists in the list');
+            return;
+        }
+        
+        // Add new config
+        this.autoModeConfigs.push({ domain: newDomain, fps: 60 });
+        input.value = '';
+        
+        this.renderAutoModeList();
+        this.saveAutoModeList();
+        this.showNotification(`✅ Added ${newDomain} to auto-detection`);
+    }
+
+    private isValidDomain(domain: string): boolean {
+        const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.?[a-zA-Z]{2,}$/;
+        return domainRegex.test(domain);
+    }
+
+    private handleAutoModeClick(e: Event): void {
+        const target = e.target as HTMLElement;
+        
+        if (target.tagName === 'BUTTON') {
+            const index = parseInt(target.dataset.index!, 10);
+            if (!isNaN(index)) {
+                const domain = this.autoModeConfigs[index].domain;
+                this.autoModeConfigs.splice(index, 1);
+                this.renderAutoModeList();
+                this.saveAutoModeList();
+                this.showNotification(`🗑️ Removed ${domain} from auto-detection`);
+            }
+        }
+    }
+
+    private handleAutoModeChange(e: Event): void {
+        const target = e.target as HTMLInputElement;
+        
+        if (target.tagName === 'INPUT' && target.type === 'number') {
+            const index = parseInt(target.dataset.index!, 10);
+            if (!isNaN(index)) {
+                let newFps = parseInt(target.value);
+                newFps = Math.max(1, Math.min(240, newFps || 60));
+                
+                this.autoModeConfigs[index].fps = newFps;
+                target.value = newFps.toString();
+                
+                this.saveAutoModeList();
+            }
+        }
+    }
+
+    private async saveAutoModeList(): Promise<void> {
+        await chrome.storage.local.set({ autoModeConfigs: this.autoModeConfigs });
+    }
+
+    // Notification handlers
+    private async addToAutoList(): Promise<void> {
+        if (this.currentHost !== 'global' && !this.autoModeConfigs.some(c => c.domain === this.currentHost)) {
+            this.autoModeConfigs.push({ domain: this.currentHost, fps: 30 });
+            this.renderAutoModeList();
+            await this.saveAutoModeList();
+            this.showNotification(`⚡ Optimized ${this.currentHost} for better performance`);
+        }
+        
+        // Remove from heavy hosts
+        const index = this.heavyHosts.indexOf(this.currentHost);
+        if (index > -1) {
+            this.heavyHosts.splice(index, 1);
+            await chrome.storage.local.set({ heavyHosts: this.heavyHosts });
+        }
+        
+        this.hideNotificationPanel('heavyPageNotification');
+    }
+
+    private async acceptGameMode(): Promise<void> {
+        // Enable gaming mode and apply game-optimized settings
+        await chrome.storage.local.set({ 
+            gamingMode: true,
+            adaptiveMode: true 
+        });
+        
+        // Apply high-performance preset
+        const gamingPreset = this.presets.find(p => p.id === 'gaming') || { fps: 144 };
+        this.syncFpsControls(gamingPreset.fps.toString());
+        this.updateFpsDisplay(gamingPreset.fps);
+        this.saveSiteSettings();
+        
+        await this.loadAllSettings();
+        this.hideNotificationPanel('gameNotification');
+        this.showNotification('🎮 Gaming mode activated with optimized settings');
+    }
+
+    private async enableBatteryMode(): Promise<void> {
+        await chrome.storage.local.set({ 
+            batteryOptimization: true,
+            adaptiveMode: true 
+        });
+        
+        // Apply battery-saving preset
+        const ecoPreset = this.presets.find(p => p.id === 'eco') || { fps: 30 };
+        this.syncFpsControls(ecoPreset.fps.toString());
+        this.updateFpsDisplay(ecoPreset.fps);
+        this.saveSiteSettings();
+        
+        await this.loadAllSettings();
+        this.hideNotificationPanel('batteryWarning');
+        this.showNotification('🔋 Battery optimization enabled');
+    }
+
+    // Profile management
+    private async switchProfile(e: Event): Promise<void> {
+        const select = e.target as HTMLSelectElement;
+        const profileId = select.value;
+        
+        await chrome.storage.local.set({ activeProfileId: profileId });
+        this.showNotification(profileId ? `📁 Switched to profile` : '📁 Using default profile');
+    }
+
+    private async addProfile(): Promise<void> {
+        const name = prompt('Enter profile name:');
+        if (!name?.trim()) return;
+        
+        const newProfile = {
+            id: Date.now().toString(),
+            name: name.trim(),
+            icon: '📁',
+            settings: {
+                globalConfig: { enabled: true, value: 60 },
+                autoModeConfigs: []
+            }
+        };
+        
+        const data = await chrome.storage.local.get('profiles');
+        const profiles = data.profiles || [];
+        profiles.push(newProfile);
+        
+        await chrome.storage.local.set({ 
+            profiles,
+            activeProfileId: newProfile.id 
+        });
+        
+        await this.loadAllSettings();
+        this.showNotification(`📁 Created profile: ${name}`);
+    }
+
+    private async editProfile(): Promise<void> {
+        const select = this.elements.profileSelect as HTMLSelectElement;
+        const profileId = select.value;
+        
+        if (!profileId) {
+            this.showError('Please select a profile to edit');
+            return;
+        }
+        
+        // Open options page with profile editing
+        chrome.runtime.openOptionsPage();
+        this.showNotification('📝 Opening profile editor...');
+    }
+
+    private async deleteProfile(): Promise<void> {
+        const select = this.elements.profileSelect as HTMLSelectElement;
+        const profileId = select.value;
+        
+        if (!profileId) {
+            this.showError('Please select a profile to delete');
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to delete this profile?')) return;
+        
+        const data = await chrome.storage.local.get('profiles');
+        const profiles = (data.profiles || []).filter((p: any) => p.id !== profileId);
+        
+        await chrome.storage.local.set({ 
+            profiles,
+            activeProfileId: profiles[0]?.id || null 
+        });
+        
+        await this.loadAllSettings();
+        this.showNotification('🗑️ Profile deleted');
+    }
+
+    // Footer actions
+    private async exportSettings(): Promise<void> {
+        try {
+            const data = await chrome.storage.local.get(null);
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fps-limiter-settings-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            this.showNotification('📤 Settings exported successfully');
+            
+        } catch (error) {
+            console.error('Export error:', error);
+            this.showError('Failed to export settings');
+        }
+    }
+
+    private async resetSettings(): Promise<void> {
+        if (!confirm('Are you sure you want to reset all settings? This cannot be undone.')) return;
+        
+        try {
+            await chrome.storage.local.clear();
+            await this.loadAllSettings();
+            this.showNotification('🔄 Settings reset to defaults');
+            
+        } catch (error) {
+            console.error('Reset error:', error);
+            this.showError('Failed to reset settings');
+        }
+    }
+
+    // Keyboard shortcuts
+    private handleKeyboardShortcuts(e: KeyboardEvent): void {
+        if (e.ctrlKey || e.metaKey) {
+            switch (e.key) {
+                case 'a':
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        this.showAIPanel();
+                    }
+                    break;
+                case 'p':
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        this.cyclePresets();
+                    }
+                    break;
+                case 'r':
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        this.resetSettings();
+                    }
+                    break;
+            }
+        }
+        
+        // ESC key to close panels
+        if (e.key === 'Escape') {
+            this.hideAIPanel();
+        }
+    }
+
+    private cyclePresets(): void {
+        const currentFps = parseInt((this.elements.fpsInput as HTMLInputElement).value);
+        const currentIndex = this.presets.findIndex(p => p.fps === currentFps);
+        const nextIndex = (currentIndex + 1) % this.presets.length;
+        const nextPreset = this.presets[nextIndex];
+        
+        if (nextPreset) {
+            this.applyPreset(nextPreset);
+        }
+    }
+
+    // Indicator updates
+    private updateAdaptiveIndicator(enabled: boolean): void {
+        const indicator = document.querySelector('#adaptiveIndicator.indicator');
+        if (indicator) {
+            indicator.classList.toggle('active', enabled);
+        }
+        
+        if (this.elements.adaptiveIndicator) {
+            this.elements.adaptiveIndicator.textContent = enabled ? 'Smart' : 'Manual';
+        }
+    }
+
+    private updateGamingIndicator(enabled: boolean): void {
+        const indicator = document.querySelector('#gameIndicator.indicator');
+        if (indicator) {
+            indicator.classList.toggle('active', enabled);
+        }
+    }
+
+    private updateBatteryIndicator(enabled: boolean): void {
+        const indicator = document.querySelector('#batteryIndicator.indicator');
+        if (indicator) {
+            indicator.classList.toggle('active', enabled);
+        }
+    }
+
+    // Animation and UI utilities
+    private setupAnimations(): void {
+        // Add smooth transitions to all interactive elements
+        const interactiveElements = document.querySelectorAll('button, input, select');
+        interactiveElements.forEach(el => {
+            el.classList.add('interactive-element');
+        });
+        
+        // Setup intersection observer for animation triggers
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.setting-group').forEach(el => observer.observe(el));
+    }
+
+    private showLoadingOverlay(show: boolean): void {
+        if (this.elements.loadingOverlay) {
+            this.elements.loadingOverlay.classList.toggle('show', show);
+        }
+    }
+
+    private showNotification(message: string, type: 'success' | 'error' | 'info' = 'success'): void {
+        // Create toast notification
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        
+        // Style the toast
+        Object.assign(toast.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: type === 'success' ? 'var(--success-color)' : 
+                       type === 'error' ? 'var(--error-color)' : 'var(--accent-color)',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: 'var(--border-radius-sm)',
+            fontSize: '13px',
+            fontWeight: '500',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            zIndex: '10000',
+            animation: 'slideInRight 0.3s ease-out forwards'
+        });
+        
+        document.body.appendChild(toast);
+        
+        // Remove after delay
+        setTimeout(() => {
+            toast.style.animation = 'slideOutRight 0.3s ease-out forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    private showError(message: string): void {
+        this.showNotification(message, 'error');
+    }
+
+    // Cleanup
+    public destroy(): void {
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+        }
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+    }
+}
+
+// CSS animations for notifications
+const toastAnimations = `
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.fps-changing {
+    animation: fpsChange 0.3s ease-out;
+}
+
+@keyframes fpsChange {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); color: var(--accent-color); }
+    100% { transform: scale(1); }
+}
+
+.has-recommendations::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background: var(--error-color);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.interactive-element {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-in {
+    animation: slideUp 0.5s ease-out;
+}
+
+.no-recommendations {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+}
+
+.no-recommendations span {
+    font-size: 32px;
+    display: block;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+`;
+
+// Inject animations
+const styleSheet = document.createElement('style');
+styleSheet.textContent = toastAnimations;
+document.head.appendChild(styleSheet);
+
+// Initialize popup when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new EnhancedPopupManager();
+});
+
+// Handle popup unload
+window.addEventListener('beforeunload', () => {
+    // Cleanup if needed
+});
+
+export default EnhancedPopupManager;
