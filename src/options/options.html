@@ -1,50 +1,278 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FPS Limiter Pro - Cài đặt</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPS Limiter Pro Max - Advanced Settings</title>
     <link rel="stylesheet" href="options.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="wrapper">
-        <header>
-            <h1>Cài đặt FPS Limiter Pro</h1>
-            <p>Quản lý tất cả các tính năng nâng cao tại đây.</p>
-        </header>
-        <main>
-            <div class="settings-card">
-                <h2>Cài đặt chung</h2>
-                <div class="form-row">
-                    <label for="applyInFrames">Áp dụng cho iFrame</label>
-                    <input type="checkbox" id="applyInFrames">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">FPS Limiter Pro Max</span>
+                </div>
+                <div class="version">v2.0.0</div>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-section">
+                    <h3>Core Settings</h3>
+                    <a href="#general" class="nav-item active" data-tab="general">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">General</span>
+                    </a>
+                    <a href="#profiles" class="nav-item" data-tab="profiles">
+                        <span class="nav-icon">📁</span>
+                        <span class="nav-text">Profiles</span>
+                    </a>
+                    <a href="#automode" class="nav-item" data-tab="automode">
+                        <span class="nav-icon">🤖</span>
+                        <span class="nav-text">Auto Mode</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Advanced</h3>
+                    <a href="#performance" class="nav-item" data-tab="performance">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Performance</span>
+                    </a>
+                    <a href="#ai" class="nav-item" data-tab="ai">
+                        <span class="nav-icon">🧠</span>
+                        <span class="nav-text">AI & Analytics</span>
+                    </a>
+                    <a href="#power" class="nav-item" data-tab="power">
+                        <span class="nav-icon">🔋</span>
+                        <span class="nav-text">Power Management</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>System</h3>
+                    <a href="#suspender" class="nav-item" data-tab="suspender">
+                        <span class="nav-icon">💤</span>
+                        <span class="nav-text">Tab Suspender</span>
+                    </a>
+                    <a href="#developer" class="nav-item" data-tab="developer">
+                        <span class="nav-icon">🔧</span>
+                        <span class="nav-text">Developer</span>
+                    </a>
+                    <a href="#import-export" class="nav-item" data-tab="import-export">
+                        <span class="nav-icon">📦</span>
+                        <span class="nav-text">Backup</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="footer-btn" id="resetAllSettings">
+                    <span>🔄</span>
+                    Reset All
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- General Settings Tab -->
+            <div class="tab-content active" id="general-tab">
+                <div class="tab-header">
+                    <h1>General Settings</h1>
+                    <p>Configure basic FPS limiter behavior and global preferences.</p>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>🎯 Core Settings</h3>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <label>Apply FPS Limiting to iFrames</label>
+                                <span class="setting-description">Enable FPS limiting for embedded content and iframes</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="applyInFrames">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <label>Global Master Override</label>
+                                <span class="setting-description">Disable all FPS limiting across all sites</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="globalDisabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>🎮 Gaming Optimizations</h3>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <label>Gaming Mode</label>
+                                <span class="setting-description">Automatically detect games and apply optimized settings</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="gamingMode">
+                                <span class="toggle-slider gaming-toggle"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <label>Auto-Detection Sensitivity</label>
+                                <span class="setting-description">How aggressively to detect gaming content</span>
+                            </div>
+                            <select id="detectionSensitivity" class="select-input">
+                                <option value="low">Conservative</option>
+                                <option value="medium" selected>Balanced</option>
+                                <option value="high">Aggressive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>🔔 Notifications</h3>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <label>Enable Notifications</label>
+                                <span class="setting-description">Show desktop notifications for important events</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notificationsEnabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <label>Performance Alerts</label>
+                                <span class="setting-description">Notify when performance issues are detected</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="performanceAlerts">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <label>Battery Warnings</label>
+                                <span class="setting-description">Alert when battery optimizations are recommended</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="batteryWarnings">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="settings-card">
-                <h2>Chế độ Ngủ đông Tab (Tiết kiệm RAM)</h2>
-                <div class="form-row">
-                    <label for="suspenderEnable">Bật tính năng</label>
-                    <input type="checkbox" id="suspenderEnable">
+            <!-- Profiles Tab -->
+            <div class="tab-content" id="profiles-tab">
+                <div class="tab-header">
+                    <h1>Profile Management</h1>
+                    <p>Create and manage FPS profiles for different scenarios and websites.</p>
+                    <button class="primary-button" id="createProfile">
+                        <span>➕</span>
+                        Create New Profile
+                    </button>
                 </div>
-                <div class="form-row">
-                    <label for="suspenderTimeout">Ngủ đông sau:</label>
-                    <select id="suspenderTimeout">
-                        <option value="15">15 phút</option>
-                        <option value="30">30 phút</option>
-                        <option value="60">1 giờ</option>
-                        <option value="120">2 giờ</option>
-                    </select>
-                </div>
-                <div class="form-row-vertical">
-                    <label for="suspenderWhitelist">Không ngủ đông các trang (mỗi trang một dòng):</label>
-                    <textarea id="suspenderWhitelist" rows="5" placeholder="krunker.io&#10;youtube.com"></textarea>
+
+                <div class="profiles-container">
+                    <div class="profiles-list" id="profilesList">
+                        <!-- Profiles will be populated here -->
+                    </div>
+                    
+                    <div class="profile-editor" id="profileEditor" style="display: none;">
+                        <div class="editor-header">
+                            <h3 id="editorTitle">Edit Profile</h3>
+                            <div class="editor-actions">
+                                <button class="secondary-button" id="cancelEdit">Cancel</button>
+                                <button class="primary-button" id="saveProfile">Save</button>
+                            </div>
+                        </div>
+                        
+                        <div class="editor-content">
+                            <div class="form-group">
+                                <label>Profile Name</label>
+                                <input type="text" id="profileName" placeholder="Enter profile name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Profile Icon</label>
+                                <div class="icon-selector" id="iconSelector">
+                                    <span class="icon-option active" data-icon="📁">📁</span>
+                                    <span class="icon-option" data-icon="🎮">🎮</span>
+                                    <span class="icon-option" data-icon="⚡">⚡</span>
+                                    <span class="icon-option" data-icon="🔋">🔋</span>
+                                    <span class="icon-option" data-icon="🌟">🌟</span>
+                                    <span class="icon-option" data-icon="🎯">🎯</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Default FPS</label>
+                                <div class="fps-input-group">
+                                    <input type="range" id="profileFpsSlider" min="1" max="240" value="60">
+                                    <input type="number" id="profileFpsInput" min="1" max="240" value="60">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Priority Mode</label>
+                                <select id="profilePriority">
+                                    <option value="performance">Performance First</option>
+                                    <option value="balanced" selected>Balanced</option>
+                                    <option value="battery">Battery Saving</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Activation Conditions</label>
+                                <div class="conditions-list" id="conditionsList">
+                                    <!-- Conditions will be added here -->
+                                </div>
+                                <button class="secondary-button" id="addCondition">+ Add Condition</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            </main>
-    </div>
-    <script src="options.js"></script>
-</body>
-</html>
+
+            <!-- Auto Mode Tab -->
+            <div class="tab-content" id="automode-tab">
+                <div class="tab-header">
+                    <h1>Auto Detection & Site Management</h1>
+                    <p>Manage automatic FPS detection and site-specific configurations.</p>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-card full-width">
+                        <div class="card-header">
+                            <h3>🤖 Auto Mode Settings</h3>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autoModeMasterEnable">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="auto-mode-content">
+                            <div class="detection-stats">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="detectedSites">0</div>
+                                    <div class="stat-label">Sites Detected</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="heavyPages">0</div>
+                                    <div class="stat-label">Heavy Pages</div>
