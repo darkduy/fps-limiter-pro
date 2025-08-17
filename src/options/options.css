@@ -1,67 +1,70 @@
+/* Enhanced Options Page CSS - Ultra Modern Design */
+:root {
+  /* Color Palette */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --error-gradient: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+  --gaming-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  --ai-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  --battery-gradient: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+  --thermal-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  --suspender-gradient: linear-gradient(135deg, #c1dfc4 0%, #deecdd 100%);
+  --dev-gradient: linear-gradient(135deg, #e0c3fc 0%, #9bb5ff 100%);
+
+  /* Base Colors */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #151515;
+  --bg-tertiary: #1f1f1f;
+  --bg-elevated: #2a2a2a;
+  --bg-surface: #1a1a1a;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #b8b8b8;
+  --text-muted: #888888;
+  --text-accent: #667eea;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.6);
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Sidebar */
+  --sidebar-width: 280px;
+}
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f0f2f5;
-    color: #1c1e21;
-    margin: 0;
-    padding: 2rem;
-}
-.wrapper {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-header {
-    text-align: center;
-}
-header h1 {
-    margin-bottom: 0.5rem;
-}
-header p {
-    margin-top: 0;
-    color: #606770;
-}
-.settings-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-}
-.settings-card h2 {
-    margin-top: 0;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e4e6eb;
-}
-.form-row, .form-row-vertical {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.form-row-vertical {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-}
-label {
-    font-weight: 500;
-}
-input[type="checkbox"] {
-    transform: scale(1.2);
-}
-select, textarea {
-    width: 100%;
-    background-color: #f0f2f5;
-    color: #1c1e21;
-    border: 1px solid #ccd0d5;
-    border-radius: 6px;
-    padding: 0.5rem;
-    font-family: inherit;
-    font-size: 1rem;
-}
-textarea {
-    resize: vertical;
-}
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-primary);
+  color: var(
